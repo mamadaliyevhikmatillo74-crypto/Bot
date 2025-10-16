@@ -188,9 +188,6 @@ async def ask_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "📞 Telefon raqamingizni kiriting:(+998200111151)")
     return ASK_PHONE
 
-# from telegram import KeyboardButton
-
-
 # Muammo so‘rash
 async def ask_issue(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.text == "🏠 Bosh menyu":
@@ -217,8 +214,6 @@ async def finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "✅ So‘rovingiz qabul qilindi. Tez orada bog‘lanamiz.",
         reply_markup=main_menu_keyboard())
     return ConversationHandler.END
-
-
 
 
 async def get_file_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -374,12 +369,7 @@ def main():
         entry_points=[MessageHandler(filters.Regex("^🛠 Texnik yordam$"), tehnik_yordam)],
         states={
             ASK_NAME:[MessageHandler(filters.TEXT & ~filters.COMMAND, ask_phone)],
-            # ASK_PHONE:[MessageHandler(filters.TEXT & ~filters.COMMAND, ask_issue)],
-            ASK_PHONE: [
-            MessageHandler(filters.CONTACT, receive_phone),   # ✅ Kontaktni qabul qilish
-            MessageHandler(filters.TEXT & ~filters.COMMAND, receive_phone)
-        ],
-
+            ASK_PHONE:[MessageHandler(filters.TEXT & ~filters.COMMAND, ask_issue)],
             ASK_ISSUE:[MessageHandler(filters.TEXT & ~filters.COMMAND, finish)],
         },
         fallbacks=[MessageHandler(filters.Regex("^🏠 Bosh menyu$"), start_from_conv)],   # 👈 o‘zgardi
@@ -422,11 +412,3 @@ def main():
 # To‘g‘ri ishga tushirish qismi
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
