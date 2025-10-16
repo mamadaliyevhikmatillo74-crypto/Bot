@@ -177,17 +177,68 @@ async def tehnik_yordam(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ASK_NAME
 
 
-# Telefon raqamni so‘rash
+# # Telefon raqamni so‘rash
+# async def ask_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     if update.message.text == "🏠 Bosh menyu":
+#         context.chat_data["_handled_by_conv"] = True   # 👈 qo‘shildi
+#         await start(update, context)
+#         return ConversationHandler.END  # <== Qo‘shildi
+#     context.user_data["name"] = update.message.text
+#     await update.message.reply_text(
+#         "📞 Telefon raqamingizni kiriting:(+998200111151)")
+#     return ASK_PHONE
+# Telefon so'rovini yuboruvchi funksiya
 async def ask_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # "Bosh menyu" tugmasi bosilganda mavjud logikani saqlaymiz
     if update.message.text == "🏠 Bosh menyu":
-        context.chat_data["_handled_by_conv"] = True   # 👈 qo‘shildi
-        await start(update, context)
-        return ConversationHandler.END  # <== Qo‘shildi
+        context.chat_data["_handled_by_conv"] = True
+        await start(update, context)      # start funksiyangiz oldindan mavjud deb hisoblayman
+        return ConversationHandler.END
+
     context.user_data["name"] = update.message.text
+
+    # Kontakt so'rov tugmasi + "Bosh menyu" uchun oddiy tugma
+    contact_button = KeyboardButton("📲 Raqamimni yuborish", request_contact=True)
+    home_button = KeyboardButton("🏠 Bosh menyu")
+    keyboard = ReplyKeyboardMarkup([[contact_button], [home_button]], resize_keyboard=True, one_time_keyboard=True)
+
     await update.message.reply_text(
-        "📞 Telefon raqamingizni kiriting:(+998200111151)")
+        "📞 Telefon raqamingizni yuboring (yoki pastdagi tugmaga bosib kontaktni yuboring):",
+        reply_markup=keyboard
+    )
     return ASK_PHONE
 
+# Kontaktni qabul qiluvchi funksiya (ASK_PHONE holati uchun)
+async def receive_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Agar foydalanuvchi kontakt yuborgan bo'lsa
+    if update.message.contact:
+        phone_number = update.message.contact.phone_number
+        context.user_data["phone"] = phone_number
+
+        # Keyboardni olib tashlaymiz (ReplyKeyboardRemove)
+        await update.message.reply_text(
+            f"✅ Raqamingiz qabul qilindi: {phone_number}",
+            reply_markup=ReplyKeyboardRemove()
+        )
+        # Keyingi qadamga o'tish: masalan, yordam so'rovini davom ettirish
+        # return NEXT_STATE yoki ConversationHandler.END — o'zingizga moslang
+        return ConversationHandler.END
+
+    # Agar foydalanuvchi "Bosh menyu" tugmasini matn sifatida yuborsa
+    if update.message.text == "🏠 Bosh menyu":
+        context.chat_data["_handled_by_conv"] = True
+        await start(update, context)
+        return ConversationHandler.END
+
+    # Boshqa matn yuborgan bo'lsa, foydalanuchiga kontakt tugmasini eslatamiz
+    await update.message.reply_text(
+        "Iltimos, telefon raqamingizni yuborish uchun 📲 Raqamimni yuborish tugmasiga bosing yoki kontaktni jo'nating.",
+        reply_markup=ReplyKeyboardMarkup(
+            [[KeyboardButton("📲 Raqamimni yuborish", request_contact=True)], [KeyboardButton("🏠 Bosh menyu")]],
+            resize_keyboard=True, one_time_keyboard=True
+        )
+    )
+    return ASK_PHONE
 # Muammo so‘rash
 async def ask_issue(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.text == "🏠 Bosh menyu":
@@ -412,3 +463,4 @@ def main():
 # To‘g‘ri ishga tushirish qismi
 if __name__ == "__main__":
     main()
+
