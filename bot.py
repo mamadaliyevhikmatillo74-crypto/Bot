@@ -177,127 +177,46 @@ async def tehnik_yordam(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ASK_NAME
 
 
-# # Telefon raqamni so‘rash
-# async def ask_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     if update.message.text == "🏠 Bosh menyu":
-#         context.chat_data["_handled_by_conv"] = True   # 👈 qo‘shildi
-#         await start(update, context)
-#         return ConversationHandler.END  # <== Qo‘shildi
-#     context.user_data["name"] = update.message.text
-#     await update.message.reply_text(
-#         "📞 Telefon raqamingizni kiriting:(+998200111151)")
-#     return ASK_PHONE
-# Telefon so'rovini yuboruvchi funksiya
-
-# Muammo so‘rash
-# async def ask_issue(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     if update.message.text == "🏠 Bosh menyu":
-#         context.chat_data["_handled_by_conv"] = True   # 👈 qo‘shildi
-#         await start(update, context)
-#         return ConversationHandler.END  # <== Qo‘shildi
-#     context.user_data["phone"] = update.message.text
-#     await update.message.reply_text("🛠 Qanday muammo bo‘layapti?")
-#     return ASK_ISSUE
-#  # Ma’lumotlarni yakunlash
-# async def finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     if update.message.text == "🏠 Bosh menyu":
-#         context.chat_data["_handled_by_conv"] = True   # 👈 qo‘shildi
-#         await start(update, context)
-#         return ConversationHandler.END  # <== Qo‘shildi
-#     context.user_data["issue"] = update.message.text
-#     data = context.user_data
-#     message = (f"📩 Texnik yordam so‘rovi:\n"
-#                f"👤 Ism: {data['name']}\n"
-#                f"📞 Tel: {data['phone']}\n"
-#                f"📝 Muammo: {data['issue']}")
-#     await context.bot.send_message(chat_id=7067985805, text=message)
-#     await update.message.reply_text(
-#         "✅ So‘rovingiz qabul qilindi. Tez orada bog‘lanamiz.",
-#         reply_markup=main_menu_keyboard())
-#     return ConversationHandler.END
-# Texnik yordam boshlanishi
-# 🆘 Texnik yordamni boshlash
-async def tehnik_yordam(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "👤 Ismingizni kiriting:\n\n🏠 Bosh menyu tugmasi bilan orqaga qaytishingiz mumkin.",
-        reply_markup=ReplyKeyboardMarkup([["🏠 Bosh menyu"]], resize_keyboard=True)
-    )
-    return ASK_NAME
-
-
-# 📞 Telefon raqamini so‘rash
+# Telefon raqamni so‘rash
 async def ask_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Agar foydalanuvchi orqaga qaytsa
     if update.message.text == "🏠 Bosh menyu":
+        context.chat_data["_handled_by_conv"] = True   # 👈 qo‘shildi
         await start(update, context)
-        return ConversationHandler.END
-
-    # Ismni saqlaymiz
+        return ConversationHandler.END  # <== Qo‘shildi
     context.user_data["name"] = update.message.text
-
-    # Kontakt so‘rash uchun tugma
-    contact_button = KeyboardButton("📲 Raqamimni yuborish", request_contact=True)
-    home_button = KeyboardButton("🏠 Bosh menyu")
-    keyboard = ReplyKeyboardMarkup([[contact_button], [home_button]], resize_keyboard=True)
-
     await update.message.reply_text(
-        "📞 Telefon raqamingizni yuboring (yoki pastdagi tugmaga bosing):",
-        reply_markup=keyboard
-    )
+        "📞 Telefon raqamingizni kiriting:(+998200111151)")
     return ASK_PHONE
+Telefon so'rovini yuboruvchi funksiya
 
-
-# ☎️ Kontaktni qabul qilish
-async def receive_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message.contact:
-        phone_number = update.message.contact.phone_number
-        context.user_data["phone"] = phone_number
-
-        await update.message.reply_text(
-            f"✅ Raqamingiz qabul qilindi: {phone_number}",
-            reply_markup=ReplyKeyboardRemove()
-        )
-        await update.message.reply_text("🛠 Qanday muammo bo‘layapti?")
-        return ASK_ISSUE
-
+Muammo so‘rash
+async def ask_issue(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.text == "🏠 Bosh menyu":
+        context.chat_data["_handled_by_conv"] = True   # 👈 qo‘shildi
         await start(update, context)
-        return ConversationHandler.END
-
-    await update.message.reply_text(
-        "Iltimos, 📲 Raqamimni yuborish tugmasidan foydalaning.",
-        reply_markup=ReplyKeyboardMarkup(
-            [[KeyboardButton("📲 Raqamimni yuborish", request_contact=True)], ["🏠 Bosh menyu"]],
-            resize_keyboard=True
-        )
-    )
-    return ASK_PHONE
-
-
-# 🧰 Muammo so‘rash va ma’lumotni yuborish
+        return ConversationHandler.END  # <== Qo‘shildi
+    context.user_data["phone"] = update.message.text
+    await update.message.reply_text("🛠 Qanday muammo bo‘layapti?")
+    return ASK_ISSUE
+ # Ma’lumotlarni yakunlash
 async def finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.text == "🏠 Bosh menyu":
+        context.chat_data["_handled_by_conv"] = True   # 👈 qo‘shildi
         await start(update, context)
-        return ConversationHandler.END
-
+        return ConversationHandler.END  # <== Qo‘shildi
     context.user_data["issue"] = update.message.text
     data = context.user_data
-
-    message = (
-        f"📩 Texnik yordam so‘rovi:\n"
-        f"👤 Ism: {data['name']}\n"
-        f"📞 Tel: {data['phone']}\n"
-        f"📝 Muammo: {data['issue']}"
-    )
-
-    # Admin ID — sizniki (7067985805)
+    message = (f"📩 Texnik yordam so‘rovi:\n"
+               f"👤 Ism: {data['name']}\n"
+               f"📞 Tel: {data['phone']}\n"
+               f"📝 Muammo: {data['issue']}")
     await context.bot.send_message(chat_id=7067985805, text=message)
-
     await update.message.reply_text(
         "✅ So‘rovingiz qabul qilindi. Tez orada bog‘lanamiz.",
-        reply_markup=main_menu_keyboard()
-    )
+        reply_markup=main_menu_keyboard())
     return ConversationHandler.END
+
+
 
 
 async def get_file_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -453,11 +372,11 @@ def main():
         entry_points=[MessageHandler(filters.Regex("^🛠 Texnik yordam$"), tehnik_yordam)],
         states={
             ASK_NAME:[MessageHandler(filters.TEXT & ~filters.COMMAND, ask_phone)],
-            # ASK_PHONE:[MessageHandler(filters.TEXT & ~filters.COMMAND, ask_issue)],
-            ASK_PHONE: [
-            MessageHandler(filters.CONTACT, receive_phone),   # ✅ Kontaktni qabul qilish
-            MessageHandler(filters.TEXT & ~filters.COMMAND, receive_phone)
-        ],
+            ASK_PHONE:[MessageHandler(filters.TEXT & ~filters.COMMAND, ask_issue)],
+        #     ASK_PHONE: [
+        #     MessageHandler(filters.CONTACT, receive_phone),   # ✅ Kontaktni qabul qilish
+        #     MessageHandler(filters.TEXT & ~filters.COMMAND, receive_phone)
+        # ],
 
             ASK_ISSUE:[MessageHandler(filters.TEXT & ~filters.COMMAND, finish)],
         },
@@ -501,6 +420,7 @@ def main():
 # To‘g‘ri ishga tushirish qismi
 if __name__ == "__main__":
     main()
+
 
 
 
