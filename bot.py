@@ -188,82 +188,106 @@ async def tehnik_yordam(update: Update, context: ContextTypes.DEFAULT_TYPE):
 #         "📞 Telefon raqamingizni kiriting:(+998200111151)")
 #     return ASK_PHONE
 # Telefon so'rovini yuboruvchi funksiya
+
+# Muammo so‘rash
+# async def ask_issue(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     if update.message.text == "🏠 Bosh menyu":
+#         context.chat_data["_handled_by_conv"] = True   # 👈 qo‘shildi
+#         await start(update, context)
+#         return ConversationHandler.END  # <== Qo‘shildi
+#     context.user_data["phone"] = update.message.text
+#     await update.message.reply_text("🛠 Qanday muammo bo‘layapti?")
+#     return ASK_ISSUE
+#  # Ma’lumotlarni yakunlash
+# async def finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     if update.message.text == "🏠 Bosh menyu":
+#         context.chat_data["_handled_by_conv"] = True   # 👈 qo‘shildi
+#         await start(update, context)
+#         return ConversationHandler.END  # <== Qo‘shildi
+#     context.user_data["issue"] = update.message.text
+#     data = context.user_data
+#     message = (f"📩 Texnik yordam so‘rovi:\n"
+#                f"👤 Ism: {data['name']}\n"
+#                f"📞 Tel: {data['phone']}\n"
+#                f"📝 Muammo: {data['issue']}")
+#     await context.bot.send_message(chat_id=7067985805, text=message)
+#     await update.message.reply_text(
+#         "✅ So‘rovingiz qabul qilindi. Tez orada bog‘lanamiz.",
+#         reply_markup=main_menu_keyboard())
+#     return ConversationHandler.END
+# Texnik yordam boshlanishi
+async def tehnik_yordam(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "👤 Ismingizni kiriting:\n\n🏠 Bosh menyu tugmasi bilan orqaga qaytishingiz mumkin.",
+        reply_markup=ReplyKeyboardMarkup([["🏠 Bosh menyu"]], resize_keyboard=True))
+    return ASK_NAME
+
+
+# Telefon raqamni so‘rash (kontakt tugmasi bilan)
 async def ask_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # "Bosh menyu" tugmasi bosilganda mavjud logikani saqlaymiz
     if update.message.text == "🏠 Bosh menyu":
-        context.chat_data["_handled_by_conv"] = True
-        await start(update, context)      # start funksiyangiz oldindan mavjud deb hisoblayman
+        await start(update, context)
         return ConversationHandler.END
 
     context.user_data["name"] = update.message.text
 
-    # Kontakt so'rov tugmasi + "Bosh menyu" uchun oddiy tugma
     contact_button = KeyboardButton("📲 Raqamimni yuborish", request_contact=True)
     home_button = KeyboardButton("🏠 Bosh menyu")
-    keyboard = ReplyKeyboardMarkup([[contact_button], [home_button]], resize_keyboard=True, one_time_keyboard=True)
+    keyboard = ReplyKeyboardMarkup([[contact_button], [home_button]], resize_keyboard=True)
 
     await update.message.reply_text(
-        "📞 Telefon raqamingizni yuboring (yoki pastdagi tugmaga bosib kontaktni yuboring):",
+        "📞 Telefon raqamingizni yuboring (yoki pastdagi tugmaga bosing):",
         reply_markup=keyboard
     )
     return ASK_PHONE
 
-# Kontaktni qabul qiluvchi funksiya (ASK_PHONE holati uchun)
+
+# Kontaktni qabul qilish
 async def receive_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Agar foydalanuvchi kontakt yuborgan bo'lsa
     if update.message.contact:
         phone_number = update.message.contact.phone_number
         context.user_data["phone"] = phone_number
 
-        # Keyboardni olib tashlaymiz (ReplyKeyboardRemove)
         await update.message.reply_text(
             f"✅ Raqamingiz qabul qilindi: {phone_number}",
             reply_markup=ReplyKeyboardRemove()
         )
-        # Keyingi qadamga o'tish: masalan, yordam so'rovini davom ettirish
-        # return NEXT_STATE yoki ConversationHandler.END — o'zingizga moslang
-        return ConversationHandler.END
 
-    # Agar foydalanuvchi "Bosh menyu" tugmasini matn sifatida yuborsa
+        await update.message.reply_text("🛠 Qanday muammo bo‘layapti?")
+        return ASK_ISSUE
+
     if update.message.text == "🏠 Bosh menyu":
-        context.chat_data["_handled_by_conv"] = True
         await start(update, context)
         return ConversationHandler.END
 
-    # Boshqa matn yuborgan bo'lsa, foydalanuchiga kontakt tugmasini eslatamiz
     await update.message.reply_text(
-        "Iltimos, telefon raqamingizni yuborish uchun 📲 Raqamimni yuborish tugmasiga bosing yoki kontaktni jo'nating.",
+        "Iltimos, 📲 Raqamimni yuborish tugmasidan foydalaning.",
         reply_markup=ReplyKeyboardMarkup(
-            [[KeyboardButton("📲 Raqamimni yuborish", request_contact=True)], [KeyboardButton("🏠 Bosh menyu")]],
-            resize_keyboard=True, one_time_keyboard=True
-        )
+            [[KeyboardButton("📲 Raqamimni yuborish", request_contact=True)], ["🏠 Bosh menyu"]],
+            resize_keyboard=True)
     )
     return ASK_PHONE
-# Muammo so‘rash
-async def ask_issue(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message.text == "🏠 Bosh menyu":
-        context.chat_data["_handled_by_conv"] = True   # 👈 qo‘shildi
-        await start(update, context)
-        return ConversationHandler.END  # <== Qo‘shildi
-    context.user_data["phone"] = update.message.text
-    await update.message.reply_text("🛠 Qanday muammo bo‘layapti?")
-    return ASK_ISSUE
- # Ma’lumotlarni yakunlash
+
+
+# Muammo so‘rash va ma’lumotni yuborish
 async def finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.text == "🏠 Bosh menyu":
-        context.chat_data["_handled_by_conv"] = True   # 👈 qo‘shildi
         await start(update, context)
-        return ConversationHandler.END  # <== Qo‘shildi
+        return ConversationHandler.END
+
     context.user_data["issue"] = update.message.text
     data = context.user_data
+
     message = (f"📩 Texnik yordam so‘rovi:\n"
                f"👤 Ism: {data['name']}\n"
                f"📞 Tel: {data['phone']}\n"
                f"📝 Muammo: {data['issue']}")
     await context.bot.send_message(chat_id=7067985805, text=message)
+
     await update.message.reply_text(
         "✅ So‘rovingiz qabul qilindi. Tez orada bog‘lanamiz.",
-        reply_markup=main_menu_keyboard())
+        reply_markup=main_menu_keyboard()
+    )
     return ConversationHandler.END
 
 
@@ -463,4 +487,5 @@ def main():
 # To‘g‘ri ishga tushirish qismi
 if __name__ == "__main__":
     main()
+
 
