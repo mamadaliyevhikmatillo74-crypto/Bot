@@ -444,7 +444,12 @@ def main():
         entry_points=[MessageHandler(filters.Regex("^🛠 Texnik yordam$"), tehnik_yordam)],
         states={
             ASK_NAME:[MessageHandler(filters.TEXT & ~filters.COMMAND, ask_phone)],
-            ASK_PHONE:[MessageHandler(filters.TEXT & ~filters.COMMAND, ask_issue)],
+            # ASK_PHONE:[MessageHandler(filters.TEXT & ~filters.COMMAND, ask_issue)],
+            ASK_PHONE: [
+            MessageHandler(filters.CONTACT, receive_phone),   # ✅ Kontaktni qabul qilish
+            MessageHandler(filters.TEXT & ~filters.COMMAND, receive_phone)
+        ],
+
             ASK_ISSUE:[MessageHandler(filters.TEXT & ~filters.COMMAND, finish)],
         },
         fallbacks=[MessageHandler(filters.Regex("^🏠 Bosh menyu$"), start_from_conv)],   # 👈 o‘zgardi
@@ -487,5 +492,6 @@ def main():
 # To‘g‘ri ishga tushirish qismi
 if __name__ == "__main__":
     main()
+
 
 
