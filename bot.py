@@ -189,7 +189,7 @@ async def tehnik_yordam(update: Update, context: ContextTypes.DEFAULT_TYPE):
 #     return ASK_PHONE
 # # Telefon so'rovini yuboruvchi funksiya
 # Telefon raqamni so‘rash (kontakt orqali)
-from telegram import KeyboardButton
+# from telegram import KeyboardButton
 
 async def ask_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.text == "🏠 Bosh menyu":
@@ -459,6 +459,7 @@ def main():
 # To‘g‘ri ishga tushirish qismi
 if __name__ == "__main__":
     main()
+
 
 
 
