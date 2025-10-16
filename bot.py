@@ -216,21 +216,26 @@ async def tehnik_yordam(update: Update, context: ContextTypes.DEFAULT_TYPE):
 #         reply_markup=main_menu_keyboard())
 #     return ConversationHandler.END
 # Texnik yordam boshlanishi
+# 🆘 Texnik yordamni boshlash
 async def tehnik_yordam(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "👤 Ismingizni kiriting:\n\n🏠 Bosh menyu tugmasi bilan orqaga qaytishingiz mumkin.",
-        reply_markup=ReplyKeyboardMarkup([["🏠 Bosh menyu"]], resize_keyboard=True))
+        reply_markup=ReplyKeyboardMarkup([["🏠 Bosh menyu"]], resize_keyboard=True)
+    )
     return ASK_NAME
 
 
-# Telefon raqamni so‘rash (kontakt tugmasi bilan)
+# 📞 Telefon raqamini so‘rash
 async def ask_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Agar foydalanuvchi orqaga qaytsa
     if update.message.text == "🏠 Bosh menyu":
         await start(update, context)
         return ConversationHandler.END
 
+    # Ismni saqlaymiz
     context.user_data["name"] = update.message.text
 
+    # Kontakt so‘rash uchun tugma
     contact_button = KeyboardButton("📲 Raqamimni yuborish", request_contact=True)
     home_button = KeyboardButton("🏠 Bosh menyu")
     keyboard = ReplyKeyboardMarkup([[contact_button], [home_button]], resize_keyboard=True)
@@ -242,7 +247,7 @@ async def ask_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ASK_PHONE
 
 
-# Kontaktni qabul qilish
+# ☎️ Kontaktni qabul qilish
 async def receive_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.contact:
         phone_number = update.message.contact.phone_number
@@ -252,7 +257,6 @@ async def receive_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"✅ Raqamingiz qabul qilindi: {phone_number}",
             reply_markup=ReplyKeyboardRemove()
         )
-
         await update.message.reply_text("🛠 Qanday muammo bo‘layapti?")
         return ASK_ISSUE
 
@@ -264,12 +268,13 @@ async def receive_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Iltimos, 📲 Raqamimni yuborish tugmasidan foydalaning.",
         reply_markup=ReplyKeyboardMarkup(
             [[KeyboardButton("📲 Raqamimni yuborish", request_contact=True)], ["🏠 Bosh menyu"]],
-            resize_keyboard=True)
+            resize_keyboard=True
+        )
     )
     return ASK_PHONE
 
 
-# Muammo so‘rash va ma’lumotni yuborish
+# 🧰 Muammo so‘rash va ma’lumotni yuborish
 async def finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.text == "🏠 Bosh menyu":
         await start(update, context)
@@ -278,10 +283,14 @@ async def finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["issue"] = update.message.text
     data = context.user_data
 
-    message = (f"📩 Texnik yordam so‘rovi:\n"
-               f"👤 Ism: {data['name']}\n"
-               f"📞 Tel: {data['phone']}\n"
-               f"📝 Muammo: {data['issue']}")
+    message = (
+        f"📩 Texnik yordam so‘rovi:\n"
+        f"👤 Ism: {data['name']}\n"
+        f"📞 Tel: {data['phone']}\n"
+        f"📝 Muammo: {data['issue']}"
+    )
+
+    # Admin ID — sizniki (7067985805)
     await context.bot.send_message(chat_id=7067985805, text=message)
 
     await update.message.reply_text(
@@ -492,6 +501,7 @@ def main():
 # To‘g‘ri ishga tushirish qismi
 if __name__ == "__main__":
     main()
+
 
 
 
